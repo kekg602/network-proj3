@@ -38,8 +38,8 @@ def sendAck(packetAckNumber):
 # or by 1 if it is the last packet
 def incrementAck(packet_data):
   global LFR
-  #global LAF
-  #global RWS
+  global LAF
+  global RWS
   
   if len(packet_data) > 0:
     LFR += len(packet_data)
@@ -170,14 +170,17 @@ while True:
               log("[recv data] " + str(packet_sequence) + " (" + str(len(packet_data)) + ") ACCEPTED (in-order)")
               sendAck(LFR)
 
-	      checkOutOfOrderPackets()
+	      #checkOutOfOrderPackets()
             # packet sent out of order, see if it should be dropped or accepted
             elif (LFR != packet_sequence):
               # if current packet seq # is > LFR and <= LAF accept the frame
 	      if (packet_sequence > LFR and packet_sequence <= LAF):
 	              log("[recv data] " + str(packet_sequence) + " (" + str(len(packet_data)) + ") ACCEPTED (out-of-order)")
-		      outOfOrderPackets.append(packet_sequence)
-              	      sendAck(LFR)
+
+                      #if (not packet_sequence in outOfOrderPackets):
+		      #   outOfOrderPackets.append(packet_sequence)
+        	      
+                      #sendAck(LFR)
 	      # else if the packet sequence is <= LFR or packet sequence > LAF, ignore it
 	      elif (packet_sequence <= LFR or packet_sequence > LAF):
 		log("[recv data] " + str(packet_sequence) + " (" + str(len(packet_data)) + ") IGNORED")
