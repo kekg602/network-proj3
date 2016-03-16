@@ -49,7 +49,7 @@ RTO = 2
 
 # set round time trip alpha for recalculating
 # the retransmission timeout
-RTT_ALPHA = .875
+RTT_ALPHA = .8
 
 # Bind to localhost and an ephemeral port
 IP_PORT = sys.argv[1]
