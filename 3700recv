@@ -55,6 +55,23 @@ def closeReceiver():
   log("[completed]")
   sys.exit(0)
 
+# look to see if we have already received
+# the next in order packet from the sender
+# if we have, send an ack for it
+def checkOutOfOrderPackets():
+  global ackNumber
+
+  check = True
+
+  while check:
+     if ackNumber in outOfOrderPackets:
+       log("Sending ack from packet out of order")
+       outOfOrderPackets.remove(ackNumber)
+       incrementAck(receivedData[ackNumber])
+       sendAck(ackNumber)
+     else:
+       check = False
+
 # set global variables
 MSG_SIZE = 1500
 TIMEOUT = 30
@@ -86,6 +103,10 @@ receivedData = {}
 # to see if next segment received is
 # in order or not, start at -1
 ackNumber = -1
+
+# keep track of packets we receive but not
+# in order so unacked
+outOfOrderPackets = []
 
 # Now listen for packets
 while True:
@@ -133,10 +154,13 @@ while True:
               incrementAck(packet_data)
               log("[recv data] " + str(packet_sequence) + " (" + str(len(packet_data)) + ") ACCEPTED (in-order)")
               sendAck(ackNumber)
+
+	      checkOutOfOrderPackets()
             # packet sent out of order, send back ack with unchanged ack number
             elif (ackNumber != packet_sequence):
               log("[recv data] " + str(packet_sequence) + " (" + str(len(packet_data)) + ") ACCEPTED (out-of-order)")
-              sendAck(ackNumber)
+	      outOfOrderPackets.append(packet_sequence)
+              #sendAck(ackNumber)
         
             # store the data
             receivedData[packet_sequence] = packet_data
